@@ -40,6 +40,10 @@ jobs:
           go-version: "1.25"
           cache: true
 
+      - name: Fetch release tag
+        if: steps.tag.outputs.new_tag != steps.tag.outputs.tag
+        run: git fetch --tags --force
+
       - name: Build & publish release
         if: steps.tag.outputs.new_tag != steps.tag.outputs.tag
         uses: goreleaser/goreleaser-action@v6
@@ -49,3 +53,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GORELEASER_CURRENT_TAG: ${{ steps.tag.outputs.new_tag }}
