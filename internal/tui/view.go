@@ -56,7 +56,7 @@ func (m Model) viewActionMenu() string {
 			}
 		}
 
-		sb.WriteString(fmt.Sprintf("  %s %s\n", cursor, style.Render(opt)))
+		fmt.Fprintf(&sb, "  %s %s\n", cursor, style.Render(opt))
 	}
 
 	helpStyle := lipgloss.NewStyle().Foreground(output.MutedColor).MarginTop(1)

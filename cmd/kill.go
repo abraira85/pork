@@ -26,7 +26,7 @@ var killCmd = &cobra.Command{
 It incorporates safety checks to prevent accidentally killing critical system processes.
 Requires confirmation before terminating the process unless --yes is provided.`,
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
 		portStr := args[0]
 		portNum, err := strconv.ParseUint(portStr, 10, 32)

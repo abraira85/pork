@@ -3,37 +3,19 @@ package output
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
-	"golang.org/x/term"
 
 	"github.com/abraira85/pork/internal/ports"
 	"github.com/abraira85/pork/internal/process"
 )
-
-// getTerminalWidth returns the width of the terminal, or a default if it cannot be determined.
-func getTerminalWidth() int {
-	width, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil || width <= 0 {
-		return 80 // fallback width
-	}
-	return width
-}
 
 // PrintActivePortsTable renders a beautiful terminal table displaying the given active ports.
 func PrintActivePortsTable(activePorts []*ports.PortInfo) {
 	if len(activePorts) == 0 {
 		PrintInfo("No active local ports found or all filtered.")
 		return
-	}
-
-	termWidth := getTerminalWidth()
-
-	progWidth := termWidth - 25
-	if progWidth < 15 {
-		progWidth = 15
 	}
 
 	t := table.New().
@@ -66,7 +48,7 @@ func PrintActivePortsTable(activePorts []*ports.PortInfo) {
 
 	for _, p := range activePorts {
 		pidStr := "-"
-		programStr := "-"
+		var programStr string
 
 		if p.PID > 0 {
 			pidStr = fmt.Sprintf("%d", p.PID)

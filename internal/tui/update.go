@@ -32,34 +32,36 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.actionIndex = 0
 			}
 		case "enter":
-			if m.state == stateTableView {
+			switch m.state {
+			case stateTableView:
 				if len(m.activePorts) > 0 {
-					// Get selected port
 					m.selectedPort = m.activePorts[m.table.Cursor()]
 					m.state = stateActionMenu
 					m.actionIndex = 0
 				}
-			} else if m.state == stateActionMenu {
+			case stateActionMenu:
 				return m.handleActionSelection()
-			} else if m.state == stateActionResult {
+			case stateActionResult:
 				m.state = stateTableView
 			}
 		case "up", "k":
-			if m.state == stateActionMenu {
+			switch m.state {
+			case stateActionMenu:
 				if m.actionIndex > 0 {
 					m.actionIndex--
 				}
-			} else if m.state == stateTableView {
+			case stateTableView:
 				var cmd tea.Cmd
 				m.table, cmd = m.table.Update(msg)
 				return m, cmd
 			}
 		case "down", "j":
-			if m.state == stateActionMenu {
+			switch m.state {
+			case stateActionMenu:
 				if m.actionIndex < 2 { // 3 options: Kill, Inspect, Cancel
 					m.actionIndex++
 				}
-			} else if m.state == stateTableView {
+			case stateTableView:
 				var cmd tea.Cmd
 				m.table, cmd = m.table.Update(msg)
 				return m, cmd

@@ -36,7 +36,7 @@ func (m *Model) GenerateRows() []table.Row {
 	var rows []table.Row
 	for _, p := range m.activePorts {
 		pidStr := "-"
-		programStr := "-"
+		var programStr string
 
 		if p.PID > 0 {
 			pidStr = fmt.Sprintf("%d", p.PID)
@@ -110,7 +110,7 @@ func NewModel(activePorts []*ports.PortInfo) Model {
 type tickMsg struct{}
 
 func tickCmd() tea.Cmd {
-	return tea.Tick(time.Second*2, func(t time.Time) tea.Msg {
+	return tea.Tick(time.Second*2, func(_ time.Time) tea.Msg {
 		return tickMsg{}
 	})
 }

@@ -26,7 +26,7 @@ It provides a beautiful and simple interface over standard tools like lsof or ne
 		output.PrintBanner()
 		if len(args) == 0 {
 			// If no port is provided, show the default help message
-			cmd.Help()
+			_ = cmd.Help()
 			return
 		}
 

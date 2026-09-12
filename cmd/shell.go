@@ -16,7 +16,7 @@ var shellCmd = &cobra.Command{
 	Use:   "shell",
 	Short: "Launch the interactive TUI",
 	Long:  `Launches an interactive terminal user interface to browse, inspect, and kill processes occupying local ports.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		scanner := ports.NewScanner()
 		activePorts, err := scanner.GetActivePorts()
 		if err != nil {

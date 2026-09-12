@@ -21,7 +21,7 @@ var freeCmd = &cobra.Command{
 If the port is occupied, it scans upwards to find the next available port.
 Useful when starting development servers and needing to quickly find an open port.`,
 	Args: cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
 		portStr := args[0]
 		portNum, err := strconv.ParseUint(portStr, 10, 32)
@@ -32,7 +32,6 @@ Useful when starting development servers and needing to quickly find an open por
 
 		scanner := ports.NewScanner()
 
-		// Check the requested port
 		isFree, err := scanner.IsFree(uint32(portNum))
 		if err != nil {
 			output.PrintError("Failed to check port: %v", err)
@@ -46,8 +45,7 @@ Useful when starting development servers and needing to quickly find an open por
 
 		output.PrintError("Port %d is busy", portNum)
 
-		// Find next free
-		for i := portNum + 1; i < 65535; i++ {
+		for i := portNum + 1; i <= 65535; i++ {
 			free, err := scanner.IsFree(uint32(i))
 			if err != nil {
 				continue

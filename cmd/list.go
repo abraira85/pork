@@ -18,7 +18,7 @@ var listCmd = &cobra.Command{
 	Short: "List active local ports",
 	Long: `Lists all active local ports currently listening on the machine.
 It displays a clean table with port, PID, and program details.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		output.PrintBanner()
 
 		scanner := ports.NewScanner()

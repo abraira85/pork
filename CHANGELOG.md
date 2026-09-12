@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `pork <port>` failed with `unknown command` — the root command rejected positional
   arguments because it also has subcommands. Now `pork 3000` inspects the port correctly.
+- `pork free` never considered port 65535 (off-by-one). It now scans up to and includes 65535.
+- Migrated the linter to golangci-lint v2 and fixed all reported issues (dead code,
+  unchecked errors, unused parameters, and staticcheck/style findings).
 
 ## [0.1.0] - 2026-06-27
 
