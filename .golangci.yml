@@ -1,0 +1,22 @@
+run:
+  timeout: 5m
+  build-tags: []
+  tests: true
+
+linters:
+  enable:
+    - govet
+    - staticcheck
+    - ineffassign
+    - unused
+    - gofmt
+    - goimports
+    - errcheck
+    - revive
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/outboss/pork
+
+issues:
+  exclude-use-default: true

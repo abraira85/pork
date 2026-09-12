@@ -19,6 +19,7 @@ var rootCmd = &cobra.Command{
 	Short: "Pork is a tiny terminal tool to inspect, visualize and free local ports.",
 	Long: `Pork is a tiny terminal tool to inspect, visualize and free local ports.
 It provides a beautiful and simple interface over standard tools like lsof or netstat.`,
+	Args: cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		output.PrintBanner()
 		if len(args) == 0 {

@@ -1,0 +1,82 @@
+<svg width="1600" height="620" viewBox="0 0 1600 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t d">
+<title id="t">pork — live terminal session</title>
+<desc id="d">Pork, a tiny terminal tool to inspect, visualize and free local ports. Terminal types whoami, pork 3000, and pork range 3000 3010, showing the port inspection details and the visual busy/free map of a port range.</desc>
+<defs>
+<linearGradient id="triad" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#38BDF8"/><stop offset="0.5" stop-color="#8B5CF6"/><stop offset="1" stop-color="#EC4899"/>
+</linearGradient>
+<linearGradient id="cardbg" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#0D0D1F"/><stop offset="1" stop-color="#06060F"/>
+</linearGradient>
+<linearGradient id="porkgrad" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0" stop-color="#FF2A75"/><stop offset="1" stop-color="#EC4899"/>
+</linearGradient>
+<filter id="blur5" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5"/></filter>
+<clipPath id="cardClip"><rect x="2" y="2" width="1596" height="616" rx="16"/></clipPath>
+</defs>
+<style>
+text{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace}
+@keyframes rl2{0%,7%{opacity:0;transform:translateY(6px)}7.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl3{0%,9%{opacity:0;transform:translateY(6px)}9.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl4{0%,21%{opacity:0;transform:translateY(6px)}21.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl5{0%,23%{opacity:0;transform:translateY(6px)}23.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl6{0%,25%{opacity:0;transform:translateY(6px)}25.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl7{0%,27%{opacity:0;transform:translateY(6px)}27.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl8{0%,45%{opacity:0;transform:translateY(6px)}45.25%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl9{0%,47.5%{opacity:0;transform:translateY(6px)}47.75%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+@keyframes rl10{0%,50.5%{opacity:0;transform:translateY(6px)}51%,99.5%{opacity:1;transform:translateY(0)}99.75%,100%{opacity:1}}
+.rl2{animation:rl2 26s linear infinite}
+.rl3{animation:rl3 26s linear infinite}
+.rl4{animation:rl4 26s linear infinite}
+.rl5{animation:rl5 26s linear infinite}
+.rl6{animation:rl6 26s linear infinite}
+.rl7{animation:rl7 26s linear infinite}
+.rl8{animation:rl8 26s linear infinite}
+.rl9{animation:rl9 26s linear infinite}
+.rl10{animation:rl10 26s linear infinite}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.cur{animation:blink 1.06s steps(1,end) infinite}
+@keyframes glowbreathe{0%,100%{opacity:0.25}50%{opacity:0.45}}
+.outerglow{animation:glowbreathe 6s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.dot{animation:dotpulse 2.4s ease-in-out infinite}
+</style>
+
+<rect class="outerglow" x="2" y="2" width="1596" height="616" rx="16" fill="none" stroke="url(#triad)" stroke-width="6" filter="url(#blur5)"/>
+<rect x="2" y="2" width="1596" height="616" rx="16" fill="url(#cardbg)" stroke="url(#triad)" stroke-width="2"/>
+
+<g clip-path="url(#cardClip)">
+<ellipse cx="220" cy="70" rx="480" ry="220" fill="#3B82F6" opacity="0.06"/>
+<ellipse cx="1380" cy="80" rx="380" ry="200" fill="#FF2A75" opacity="0.05"/>
+
+<line x1="2" y1="56" x2="1598" y2="56" stroke="#1E2440" stroke-width="1"/>
+<circle cx="36" cy="28" r="7" fill="#FF5F57" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+<circle cx="60" cy="28" r="7" fill="#FEBC2E" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+<circle cx="84" cy="28" r="7" fill="#28C840" stroke="rgba(0,0,0,0.25)" stroke-width="1"/>
+<text x="800" y="34" text-anchor="middle" font-size="18" fill="#8A93B2">rober@outboss: ~/pork</text>
+
+<text x="48" y="112" font-size="24"><tspan fill="#C4B5FD">~</tspan><tspan fill="#8A93B2">/pork </tspan><tspan fill="#38BDF8">❯</tspan><tspan fill="#8A93B2"> </tspan><tspan fill="#E6E9F5">w<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.002;0.985"/></tspan><tspan fill="#E6E9F5">h<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.007;0.985"/></tspan><tspan fill="#E6E9F5">o<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.012;0.985"/></tspan><tspan fill="#E6E9F5">a<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.017;0.985"/></tspan><tspan fill="#E6E9F5">m<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.022;0.985"/></tspan><tspan fill="#E6E9F5">i<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.027;0.985"/></tspan></text>
+
+<g class="rl2"><text x="48" y="164" font-size="34" font-weight="700" fill="url(#porkgrad)">pork</text></g>
+<g class="rl3"><text x="48" y="206" font-size="22" fill="#8A93B2">stop fighting lsof · ss · netstat · random kill commands</text></g>
+
+<text x="48" y="262" font-size="24"><tspan fill="#C4B5FD">~</tspan><tspan fill="#8A93B2">/pork </tspan><tspan fill="#38BDF8">❯</tspan><tspan fill="#8A93B2"> </tspan><tspan fill="#E6E9F5">p<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.14;0.985"/></tspan><tspan fill="#E6E9F5">o<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.145;0.985"/></tspan><tspan fill="#E6E9F5">r<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.15;0.985"/></tspan><tspan fill="#E6E9F5">k<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.155;0.985"/></tspan><tspan fill="#E6E9F5"> <animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.16;0.985"/></tspan><tspan fill="#E6E9F5">3<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.165;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.17;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.175;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.18;0.985"/></tspan></text>
+
+<g class="rl4"><text x="48" y="306" font-size="22" font-weight="700" fill="url(#porkgrad)">Error: Port 3000 is busy</text></g>
+<g class="rl5"><text x="48" y="340" font-size="20"><tspan fill="#8A93B2">PID  </tspan><tspan fill="#E6E9F5">18422</tspan><tspan fill="#8A93B2">   Process </tspan><tspan fill="#E6E9F5">node</tspan></text></g>
+<g class="rl6"><text x="48" y="372" font-size="20"><tspan fill="#8A93B2">User </tspan><tspan fill="#E6E9F5">rober</tspan><tspan fill="#8A93B2">   Command </tspan><tspan fill="#E6E9F5">npm run dev</tspan></text></g>
+<g class="rl7"><text x="48" y="404" font-size="20"><tspan fill="#8A93B2">Address </tspan><tspan fill="#E6E9F5">127.0.0.1:3000</tspan><tspan fill="#8A93B2">   Protocol </tspan><tspan fill="#E6E9F5">TCP</tspan><tspan fill="#8A93B2">   Status </tspan><tspan fill="#E6E9F5">LISTEN</tspan></text></g>
+
+<text x="48" y="452" font-size="24"><tspan fill="#C4B5FD">~</tspan><tspan fill="#8A93B2">/pork </tspan><tspan fill="#38BDF8">❯</tspan><tspan fill="#8A93B2"> </tspan><tspan fill="#E6E9F5">p<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.34;0.985"/></tspan><tspan fill="#E6E9F5">o<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.345;0.985"/></tspan><tspan fill="#E6E9F5">r<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.35;0.985"/></tspan><tspan fill="#E6E9F5">k<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.355;0.985"/></tspan><tspan fill="#E6E9F5"> <animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.36;0.985"/></tspan><tspan fill="#E6E9F5">r<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.365;0.985"/></tspan><tspan fill="#E6E9F5">a<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.37;0.985"/></tspan><tspan fill="#E6E9F5">n<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.375;0.985"/></tspan><tspan fill="#E6E9F5">g<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.38;0.985"/></tspan><tspan fill="#E6E9F5">e<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.385;0.985"/></tspan><tspan fill="#E6E9F5"> <animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.39;0.985"/></tspan><tspan fill="#E6E9F5">3<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.395;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.40;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.405;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.41;0.985"/></tspan><tspan fill="#E6E9F5"> <animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.415;0.985"/></tspan><tspan fill="#E6E9F5">3<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.42;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.425;0.985"/></tspan><tspan fill="#E6E9F5">1<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.43;0.985"/></tspan><tspan fill="#E6E9F5">0<animate attributeName="opacity" repeatCount="indefinite" dur="26s" calcMode="discrete" values="0;1;0" keyTimes="0;0.435;0.985"/></tspan></text>
+
+<g class="rl8"><text x="48" y="494" font-size="26"><tspan fill="#FF2A75">●</tspan><tspan fill="#3E4763"> ○ ○ ○ ○ </tspan><tspan fill="#FF2A75">●</tspan><tspan fill="#3E4763"> ○ ○ ○ ○ </tspan><tspan fill="#FF2A75">●</tspan></text></g>
+<g class="rl9"><text x="48" y="524" font-size="20"><tspan fill="#FF2A75">●</tspan><tspan fill="#8A93B2"> busy   </tspan><tspan fill="#28C840">○</tspan><tspan fill="#8A93B2"> free   </tspan><tspan fill="#E6E9F5">3000, 3005, 3010 in use</tspan></text></g>
+
+<g class="rl10">
+<text x="48" y="560" font-size="24"><tspan fill="#C4B5FD">~</tspan><tspan fill="#8A93B2">/pork </tspan><tspan fill="#38BDF8">❯</tspan><tspan fill="#8A93B2"> </tspan></text>
+<rect class="cur" x="332" y="540" width="14" height="26" fill="#38BDF8"/>
+</g>
+</g>
+
+<text x="1552" y="596" text-anchor="end" font-size="15" fill="#8A93B2"><tspan class="dot" fill="#28C840">●</tspan> go: build passing</text>
+</svg>

@@ -1,0 +1,30 @@
+# Changelog
+
+All notable changes to this project are documented here.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- Project documentation and open-source structure (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY).
+- CI pipeline (lint, vet, test, build) via GitHub Actions.
+- Release pipeline with GoReleaser.
+
+### Fixed
+
+- `pork <port>` failed with `unknown command` — the root command rejected positional
+  arguments because it also has subcommands. Now `pork 3000` inspects the port correctly.
+
+## [0.1.0] - 2026-06-27
+
+### Added
+
+- `pork <port>` — inspect a port and show the process occupying it.
+- `pork list` — table of all listening ports.
+- `pork kill <port>` — safely free a port with confirmation and critical-process protection.
+- `pork free <port>` — find the next available port.
+- `pork range <start> <end>` — visual map of busy/free ports.
+- `pork shell` — interactive TUI to browse, inspect, and kill.
