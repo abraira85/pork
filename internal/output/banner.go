@@ -3,6 +3,7 @@ package output
 
 import (
 	"fmt"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -15,11 +16,11 @@ func PrintBanner() {
  |  __/ (_) | |   |   < 
  |_|   \___/|_|   |_|\_\
 `
-	
+
 	style := lipgloss.NewStyle().
 		Foreground(PrimaryColor).
 		Bold(true)
-		
+
 	subtitle := lipgloss.NewStyle().
 		Foreground(MutedColor).
 		Italic(true).

@@ -5,8 +5,9 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/outboss/pork/internal/ports"
-	"github.com/outboss/pork/internal/process"
+
+	"github.com/abraira85/pork/internal/ports"
+	"github.com/abraira85/pork/internal/process"
 )
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -31,34 +32,36 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.actionIndex = 0
 			}
 		case "enter":
-			if m.state == stateTableView {
+			switch m.state {
+			case stateTableView:
 				if len(m.activePorts) > 0 {
-					// Get selected port
 					m.selectedPort = m.activePorts[m.table.Cursor()]
 					m.state = stateActionMenu
 					m.actionIndex = 0
 				}
-			} else if m.state == stateActionMenu {
+			case stateActionMenu:
 				return m.handleActionSelection()
-			} else if m.state == stateActionResult {
+			case stateActionResult:
 				m.state = stateTableView
 			}
 		case "up", "k":
-			if m.state == stateActionMenu {
+			switch m.state {
+			case stateActionMenu:
 				if m.actionIndex > 0 {
 					m.actionIndex--
 				}
-			} else if m.state == stateTableView {
+			case stateTableView:
 				var cmd tea.Cmd
 				m.table, cmd = m.table.Update(msg)
 				return m, cmd
 			}
 		case "down", "j":
-			if m.state == stateActionMenu {
+			switch m.state {
+			case stateActionMenu:
 				if m.actionIndex < 2 { // 3 options: Kill, Inspect, Cancel
 					m.actionIndex++
 				}
-			} else if m.state == stateTableView {
+			case stateTableView:
 				var cmd tea.Cmd
 				m.table, cmd = m.table.Update(msg)
 				return m, cmd
@@ -84,20 +87,20 @@ func (m *Model) handleActionSelection() (tea.Model, tea.Cmd) {
 			m.state = stateActionResult
 			return *m, nil
 		}
-		
+
 		if process.IsCritical(m.selectedPort.Process, m.selectedPort.PID) {
 			m.resultMsg = fmt.Sprintf("Safety check failed: Process '%s' is critical.", m.selectedPort.Process)
 			m.state = stateActionResult
 			return *m, nil
 		}
-		
+
 		p, err := os.FindProcess(int(m.selectedPort.PID))
 		if err != nil {
 			m.resultMsg = fmt.Sprintf("Error finding process: %v", err)
 			m.state = stateActionResult
 			return *m, nil
 		}
-		
+
 		err = p.Kill()
 		if err != nil {
 			m.resultMsg = fmt.Sprintf("Failed to kill process: %v", err)
@@ -105,12 +108,12 @@ func (m *Model) handleActionSelection() (tea.Model, tea.Cmd) {
 			m.resultMsg = fmt.Sprintf("Process %d (%s) killed successfully.", m.selectedPort.PID, m.selectedPort.Process)
 			m.reloadPorts()
 		}
-		
+
 		m.state = stateActionResult
 		return *m, nil
 	case 1:
 		// Inspect
-		m.resultMsg = fmt.Sprintf("Port: %d\nPID: %d\nProcess: %s\nCommand: %s", 
+		m.resultMsg = fmt.Sprintf("Port: %d\nPID: %d\nProcess: %s\nCommand: %s",
 			m.selectedPort.Port, m.selectedPort.PID, m.selectedPort.Process, m.selectedPort.Command)
 		m.state = stateActionResult
 		return *m, nil
@@ -128,7 +131,7 @@ func (m *Model) reloadPorts() {
 	m.activePorts = activePorts
 	rows := m.GenerateRows()
 	m.table.SetRows(rows)
-	
+
 	// Clamp cursor if the list shrunk
 	if m.table.Cursor() >= len(rows) {
 		if len(rows) > 0 {

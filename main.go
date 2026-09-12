@@ -4,7 +4,7 @@
 package main
 
 import (
-	"github.com/outboss/pork/cmd"
+	"github.com/abraira85/pork/cmd"
 )
 
 // main initializes and executes the root Cobra command.

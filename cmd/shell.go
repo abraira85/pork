@@ -5,17 +5,18 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/outboss/pork/internal/output"
-	"github.com/outboss/pork/internal/ports"
-	"github.com/outboss/pork/internal/tui"
 	"github.com/spf13/cobra"
+
+	"github.com/abraira85/pork/internal/output"
+	"github.com/abraira85/pork/internal/ports"
+	"github.com/abraira85/pork/internal/tui"
 )
 
 var shellCmd = &cobra.Command{
 	Use:   "shell",
 	Short: "Launch the interactive TUI",
 	Long:  `Launches an interactive terminal user interface to browse, inspect, and kill processes occupying local ports.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		scanner := ports.NewScanner()
 		activePorts, err := scanner.GetActivePorts()
 		if err != nil {

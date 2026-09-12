@@ -5,8 +5,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/outboss/pork/internal/ports"
-	"github.com/outboss/pork/internal/output"
+
+	"github.com/abraira85/pork/internal/output"
+	"github.com/abraira85/pork/internal/ports"
 )
 
 // listCmd represents the "list" command.
@@ -17,9 +18,9 @@ var listCmd = &cobra.Command{
 	Short: "List active local ports",
 	Long: `Lists all active local ports currently listening on the machine.
 It displays a clean table with port, PID, and program details.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		output.PrintBanner()
-		
+
 		scanner := ports.NewScanner()
 		activePorts, err := scanner.GetActivePorts()
 		if err != nil {

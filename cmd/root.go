@@ -8,8 +8,9 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/outboss/pork/internal/ports"
-	"github.com/outboss/pork/internal/output"
+
+	"github.com/abraira85/pork/internal/output"
+	"github.com/abraira85/pork/internal/ports"
 )
 
 // rootCmd represents the base command when called without any subcommands.
@@ -19,11 +20,13 @@ var rootCmd = &cobra.Command{
 	Short: "Pork is a tiny terminal tool to inspect, visualize and free local ports.",
 	Long: `Pork is a tiny terminal tool to inspect, visualize and free local ports.
 It provides a beautiful and simple interface over standard tools like lsof or netstat.`,
+	Version: version,
+	Args:    cobra.ArbitraryArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		output.PrintBanner()
 		if len(args) == 0 {
 			// If no port is provided, show the default help message
-			cmd.Help()
+			_ = cmd.Help()
 			return
 		}
 

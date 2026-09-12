@@ -1,0 +1,7 @@
+# Keep this light -- catch real mistakes, not style nitpicks.
+default: true
+MD013: false   # line length
+MD033: false   # inline HTML (used intentionally in templates)
+MD041: false   # first line doesn't have to be a top-level heading
+MD024:
+  siblings_only: true   # allow repeated headings across different files

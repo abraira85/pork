@@ -9,9 +9,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/outboss/pork/internal/output"
-	"github.com/outboss/pork/internal/ports"
-	"github.com/outboss/pork/internal/process"
+
+	"github.com/abraira85/pork/internal/output"
+	"github.com/abraira85/pork/internal/ports"
+	"github.com/abraira85/pork/internal/process"
 )
 
 // killCmd represents the "kill" command.
@@ -24,8 +25,8 @@ var killCmd = &cobra.Command{
 	Long: `Finds the process occupying the specified port and attempts to kill it.
 It incorporates safety checks to prevent accidentally killing critical system processes.
 Requires confirmation before terminating the process unless --yes is provided.`,
-	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Args: cobra.ExactArgs(1),
+	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
 		portStr := args[0]
 		portNum, err := strconv.ParseUint(portStr, 10, 32)
