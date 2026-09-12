@@ -6,7 +6,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/outboss/pork/internal/ports"
+
+	"github.com/abraira85/pork/internal/ports"
 )
 
 // PrintPortInspection renders the details of a specific port in a clear, formatted layout.

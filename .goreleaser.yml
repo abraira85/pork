@@ -9,6 +9,9 @@ builds:
   - main: ./main.go
     env:
       - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - "-X github.com/abraira85/pork/cmd.version={{.Version}}"
     goos:
       - linux
       - darwin
@@ -38,10 +41,12 @@ changelog:
       - "^chore:"
       - "^ci:"
 
-brews:
-  - name: pork
-    homepage: "https://github.com/abraira85/pork"
-    description: "A tiny terminal tool to inspect, visualize and free local ports."
-    repository:
-      owner: abraira85
-      name: homebrew-pork
+# Homebrew tap is disabled until the abraira85/homebrew-pork repository
+# exists. Enable the block below once the tap is created.
+# brews:
+#   - name: pork
+#     homepage: "https://github.com/abraira85/pork"
+#     description: "A tiny terminal tool to inspect, visualize and free local ports."
+#     repository:
+#       owner: abraira85
+#       name: homebrew-pork

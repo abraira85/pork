@@ -8,10 +8,11 @@ import (
 	"github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/outboss/pork/internal/output"
-	"github.com/outboss/pork/internal/ports"
-	"github.com/outboss/pork/internal/process"
 	"golang.org/x/term"
+
+	"github.com/abraira85/pork/internal/output"
+	"github.com/abraira85/pork/internal/ports"
+	"github.com/abraira85/pork/internal/process"
 )
 
 type sessionState int
@@ -36,14 +37,14 @@ func (m *Model) GenerateRows() []table.Row {
 	for _, p := range m.activePorts {
 		pidStr := "-"
 		programStr := "-"
-		
+
 		if p.PID > 0 {
 			pidStr = fmt.Sprintf("%d", p.PID)
 			programStr = process.Identify(p.Process, p.Command)
 		} else {
 			programStr = "Unknown (try with sudo)"
 		}
-		
+
 		rows = append(rows, table.Row{
 			fmt.Sprintf("%d", p.Port),
 			pidStr,
@@ -60,12 +61,12 @@ func NewModel(activePorts []*ports.PortInfo) Model {
 		width = 80
 		height = 24
 	}
-	
+
 	progWidth := width - 25
 	if progWidth < 15 {
 		progWidth = 15
 	}
-	
+
 	tableHeight := height - 8
 	if tableHeight < 5 {
 		tableHeight = 5

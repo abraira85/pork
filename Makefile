@@ -25,6 +25,11 @@ vet:
 fmt:
 	@echo "🐷 Formatting code..."
 	@gofmt -s -w .
+	@if command -v goimports >/dev/null 2>&1; then \
+		goimports -w -local github.com/abraira85/pork .; \
+	else \
+		echo "goimports not installed — skipping import grouping"; \
+	fi
 
 run: build
 	@./bin/pork

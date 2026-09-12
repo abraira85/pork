@@ -1,4 +1,4 @@
-module github.com/outboss/pork
+module github.com/abraira85/pork
 
 go 1.25.0
 

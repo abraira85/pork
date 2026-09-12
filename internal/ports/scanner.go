@@ -6,7 +6,8 @@ import (
 	"sort"
 
 	gopsnet "github.com/shirou/gopsutil/v3/net"
-	porkprocess "github.com/outboss/pork/internal/process"
+
+	porkprocess "github.com/abraira85/pork/internal/process"
 )
 
 // Scanner handles scanning for active ports and mapping them to processes.
@@ -37,7 +38,7 @@ func (s *Scanner) GetActivePorts() ([]*PortInfo, error) {
 		}
 
 		port := conn.Laddr.Port
-		
+
 		// Avoid duplicate entries if multiple interfaces listen on the same port
 		if seen[port] {
 			continue

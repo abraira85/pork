@@ -4,31 +4,32 @@ package output
 
 import (
 	"fmt"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
 var (
 	// PrimaryColor is the main brand color for Pork (a vibrant pink/magenta).
 	PrimaryColor = lipgloss.Color("#FF2A75")
-	
+
 	// SecondaryColor is used for accents.
 	SecondaryColor = lipgloss.Color("#FF7EB3")
-	
+
 	// SuccessColor is used for positive outcomes (e.g., port is free).
 	SuccessColor = lipgloss.Color("#00E676")
-	
+
 	// WarningColor is used for cautions (e.g., critical process).
 	WarningColor = lipgloss.Color("#FFC400")
-	
+
 	// DangerColor is used for destructive actions (e.g., killing a process) or busy ports.
 	DangerColor = lipgloss.Color("#FF1744")
-	
+
 	// MutedColor is used for secondary information.
 	MutedColor = lipgloss.Color("#757575")
 
 	// Pig is the standard Pork mascot emoji prefix.
 	Pig = lipgloss.NewStyle().Foreground(PrimaryColor).Render("🐷")
-	
+
 	// WarningIcon is used for warnings.
 	WarningIcon = lipgloss.NewStyle().Foreground(WarningColor).Render("⚠️")
 
@@ -37,12 +38,12 @@ var (
 			Bold(true).
 			Foreground(PrimaryColor).
 			MarginBottom(1)
-			
+
 	// LabelStyle is used for field names (e.g., "PID", "Process").
 	LabelStyle = lipgloss.NewStyle().
 			Foreground(SecondaryColor).
 			Width(10)
-			
+
 	// ValueStyle is used for field values.
 	ValueStyle = lipgloss.NewStyle().
 			Bold(true)

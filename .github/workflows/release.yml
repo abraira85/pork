@@ -10,7 +10,8 @@ permissions:
 
 jobs:
   goreleaser:
-    runs-on: ubuntu-latest
+    name: Build & publish release
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4

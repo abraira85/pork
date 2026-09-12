@@ -36,6 +36,7 @@ COMMANDS
 
 OPTIONS
     --help          show help
+    --version       show the current version
 ```
 
 ## `~ ❯ pork 3000`
@@ -181,7 +182,7 @@ Grab the latest release for your platform from the
 ### Go install
 
 ```bash
-go install github.com/outboss/pork@latest
+go install github.com/abraira85/pork@latest
 ```
 
 ### From source

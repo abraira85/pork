@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/outboss/pork/internal/output"
+
+	"github.com/abraira85/pork/internal/output"
 )
 
 func (m Model) View() string {
@@ -23,7 +24,7 @@ func (m Model) View() string {
 func (m Model) viewTable() string {
 	helpStyle := lipgloss.NewStyle().Foreground(output.MutedColor).MarginTop(1)
 	helpText := helpStyle.Render("↑/↓: Navigate • Enter: Select • q/Esc: Quit")
-	
+
 	return fmt.Sprintf(
 		"\n  %s\n\n%s\n%s\n",
 		lipgloss.NewStyle().Foreground(output.PrimaryColor).Bold(true).Render("🐷 Pork Interactive Shell"),
@@ -37,7 +38,7 @@ func (m Model) viewActionMenu() string {
 	title := titleStyle.Render(fmt.Sprintf("Actions for Port %d (PID: %d)", m.selectedPort.Port, m.selectedPort.PID))
 
 	options := []string{"Kill Process", "Inspect Details", "Cancel"}
-	
+
 	var sb strings.Builder
 	sb.WriteString("\n  ")
 	sb.WriteString(title)
@@ -46,7 +47,7 @@ func (m Model) viewActionMenu() string {
 	for i, opt := range options {
 		cursor := "  "
 		style := lipgloss.NewStyle()
-		
+
 		if m.actionIndex == i {
 			cursor = ">>"
 			style = style.Foreground(output.SecondaryColor).Bold(true)
@@ -54,7 +55,7 @@ func (m Model) viewActionMenu() string {
 				style = style.Foreground(output.DangerColor)
 			}
 		}
-		
+
 		sb.WriteString(fmt.Sprintf("  %s %s\n", cursor, style.Render(opt)))
 	}
 
@@ -68,12 +69,12 @@ func (m Model) viewActionMenu() string {
 func (m Model) viewActionResult() string {
 	titleStyle := lipgloss.NewStyle().Foreground(output.PrimaryColor).Bold(true).MarginBottom(1)
 	title := titleStyle.Render("Result")
-	
+
 	bodyStyle := lipgloss.NewStyle().Padding(1, 2).BorderStyle(lipgloss.RoundedBorder()).BorderForeground(output.MutedColor)
 	body := bodyStyle.Render(m.resultMsg)
 
 	helpStyle := lipgloss.NewStyle().Foreground(output.MutedColor).MarginTop(1)
 	helpText := helpStyle.Render("Enter/Esc: Back")
-	
+
 	return fmt.Sprintf("\n  %s\n%s\n\n  %s\n", title, body, helpText)
 }

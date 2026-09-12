@@ -7,8 +7,9 @@ import (
 	"strconv"
 
 	"github.com/spf13/cobra"
-	"github.com/outboss/pork/internal/output"
-	"github.com/outboss/pork/internal/ports"
+
+	"github.com/abraira85/pork/internal/output"
+	"github.com/abraira85/pork/internal/ports"
 )
 
 // rangeCmd represents the "range" command.
@@ -20,26 +21,26 @@ var rangeCmd = &cobra.Command{
 	Long: `Scans an inclusive range of ports (from start to end) and displays a visual map.
 It shows which ports are free and which are busy, along with the process information
 for the busy ports.`,
-	Args:  cobra.ExactArgs(2),
+	Args: cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
 		output.PrintBanner()
 		startStr := args[0]
 		endStr := args[1]
-		
+
 		startNum, err1 := strconv.ParseUint(startStr, 10, 32)
 		endNum, err2 := strconv.ParseUint(endStr, 10, 32)
-		
+
 		if err1 != nil || err2 != nil || startNum > endNum {
 			output.PrintError("Invalid range: %s to %s", startStr, endStr)
 			os.Exit(1)
 		}
 
 		output.PrintInfo("Pork range scan\n")
-		
+
 		scanner := ports.NewScanner()
-		
+
 		var nextFree uint32
-		
+
 		for i := startNum; i <= endNum; i++ {
 			info, err := scanner.GetPortInfo(uint32(i))
 			if err != nil || info == nil {
@@ -51,7 +52,7 @@ for the busy ports.`,
 				fmt.Printf("%d  ● busy   %-15s PID %d\n", i, info.Process, info.PID)
 			}
 		}
-		
+
 		fmt.Printf("\n● busy   ○ free\n\n")
 		if nextFree != 0 {
 			output.PrintSuccess("Next free port: %d", nextFree)

@@ -10,8 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Project documentation and open-source structure (CONTRIBUTING, CODE_OF_CONDUCT, SECURITY).
-- CI pipeline (lint, vet, test, build) via GitHub Actions.
-- Release pipeline with GoReleaser.
+- CI pipeline (lint, vet, test, build) running on a self-hosted runner.
+- Automated releases with Semantic Versioning: every push to `main` bumps the
+  version tag from Conventional Commits (`patch` by default, `feat!`/`feat:`
+  bump `major`/`minor`) and GoReleaser publishes tagged binaries.
+- Version injected into the binary (`pork --version`).
 
 ### Fixed
 
