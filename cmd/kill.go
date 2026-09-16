@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -15,69 +14,136 @@ import (
 	"github.com/abraira85/pork/internal/process"
 )
 
+var (
+	// killYes skips the interactive confirmation prompt.
+	killYes bool
+	// killForce additionally allows terminating processes flagged as critical.
+	killForce bool
+)
+
 // killCmd represents the "kill" command.
-// It finds the process listening on the specified port and terminates it.
-// By default, it uses a graceful termination signal and asks for user confirmation,
-// unless overridden by flags.
+// It finds the process(es) listening on the specified port and terminates them,
+// asking for confirmation first and flagging critical system processes.
 var killCmd = &cobra.Command{
 	Use:   "kill [port]",
 	Short: "Kill the process using a specific port",
-	Long: `Finds the process occupying the specified port and attempts to kill it.
-It incorporates safety checks to prevent accidentally killing critical system processes.
-Requires confirmation before terminating the process unless --yes is provided.`,
+	Long: `Finds the process occupying the specified port and terminates it.
+
+Pork asks the process to shut down cleanly first and only forces the kill if it
+is still alive a few seconds later, so sockets and buffers get a chance to close.
+
+Processes that look like critical system components are flagged with an extra
+warning before you confirm. Use --yes to skip the prompt in scripts; killing a
+critical process non-interactively also requires --force.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
-		portStr := args[0]
-		portNum, err := strconv.ParseUint(portStr, 10, 32)
+
+		port, err := parsePort(args[0])
 		if err != nil {
-			output.PrintError("Invalid port number: %s", portStr)
+			output.PrintError("%v", err)
 			os.Exit(1)
 		}
 
 		scanner := ports.NewScanner()
-		info, err := scanner.GetPortInfo(uint32(portNum))
+		listeners, err := scanner.GetPortProcesses(port)
 		if err != nil {
 			output.PrintError("Failed to inspect port: %v", err)
 			os.Exit(1)
 		}
 
-		if info == nil {
-			output.PrintSuccess("Port %d is already free", portNum)
+		if len(listeners) == 0 {
+			output.PrintSuccess("Port %d is already free", port)
 			return
 		}
 
-		output.PrintInfo("Port %d is used by %s PID %d\n", portNum, info.Process, info.PID)
-		if info.Command != "" {
-			fmt.Printf("Command:\n%s\n\n", info.Command)
+		for _, info := range listeners {
+			output.PrintInfo("Port %d is used by %s PID %d", port, info.Process, info.PID)
+			if info.Command != "" {
+				fmt.Printf("Command:\n%s\n", info.Command)
+			}
+			fmt.Println()
 		}
 
-		if process.IsCritical(info.Process, info.PID) {
-			output.PrintWarning("This process may be important:")
-			fmt.Printf("\nPID      %d\nProcess  %s\nCommand  %s\n\n", info.PID, info.Process, info.Command)
-			fmt.Print("Kill anyway? [y/N]: ")
-		} else {
-			fmt.Print("Kill process? [y/N]: ")
-		}
+		critical := criticalListeners(listeners)
+		if len(critical) > 0 {
+			output.PrintWarning("This may be a critical system process:")
+			for _, info := range critical {
+				fmt.Printf("\nPID      %d\nProcess  %s\nCommand  %s\n", info.PID, info.Process, info.Command)
+			}
+			fmt.Println()
 
-		reader := bufio.NewReader(os.Stdin)
-		response, _ := reader.ReadString('\n')
-		response = strings.ToLower(strings.TrimSpace(response))
-
-		if response == "y" || response == "yes" {
-			if err := process.Terminate(info.PID); err != nil {
-				output.PrintError("Failed to kill process: %v", err)
+			if killYes && !killForce {
+				output.PrintError("Refusing to terminate a critical process with --yes alone. Re-run interactively or add --force.")
 				os.Exit(1)
 			}
-			output.PrintSuccess("Freed port %d", portNum)
-			fmt.Printf("Killed %s process PID %d\n", info.Process, info.PID)
-		} else {
-			fmt.Println("Aborted.")
 		}
+
+		if !confirmKill(len(critical) > 0) {
+			fmt.Println("Aborted.")
+			return
+		}
+
+		failures := 0
+		for _, info := range listeners {
+			if err := process.Terminate(info.PID); err != nil {
+				output.PrintError("Failed to kill %s PID %d: %v", info.Process, info.PID, err)
+				failures++
+				continue
+			}
+			fmt.Printf("Killed %s process PID %d\n", info.Process, info.PID)
+		}
+
+		if failures > 0 {
+			os.Exit(1)
+		}
+
+		output.PrintSuccess("Freed port %d", port)
 	},
+}
+
+// criticalListeners returns the subset of listeners whose owning process looks
+// like a critical system component.
+func criticalListeners(listeners []*ports.PortInfo) []*ports.PortInfo {
+	var critical []*ports.PortInfo
+	for _, info := range listeners {
+		if process.IsCritical(info.Process, info.PID) {
+			critical = append(critical, info)
+		}
+	}
+	return critical
+}
+
+// confirmKill asks the user to confirm the termination, unless --yes was given.
+//
+// A closed or empty stdin counts as "no": without this, running pork in a
+// pipeline or CI job would silently abort anyway, so the explicit --yes flag is
+// the only way to kill unattended.
+func confirmKill(critical bool) bool {
+	if killYes {
+		return true
+	}
+
+	if critical {
+		fmt.Print("Kill anyway? [y/N]: ")
+	} else {
+		fmt.Print("Kill process? [y/N]: ")
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+	response, err := reader.ReadString('\n')
+	if err != nil && response == "" {
+		fmt.Println()
+		return false
+	}
+
+	response = strings.ToLower(strings.TrimSpace(response))
+	return response == "y" || response == "yes"
 }
 
 // init registers the killCmd as a subcommand of rootCmd.
 func init() {
+	killCmd.Flags().BoolVarP(&killYes, "yes", "y", false, "skip the confirmation prompt")
+	killCmd.Flags().BoolVar(&killForce, "force", false, "allow terminating critical system processes non-interactively")
 	rootCmd.AddCommand(killCmd)
 }

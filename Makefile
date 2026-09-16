@@ -1,4 +1,4 @@
-.PHONY: build test lint vet fmt run clean install release
+.PHONY: build test test-race lint lint-docs tidy vet fmt run clean install release
 
 GO ?= $(shell command -v go 2> /dev/null || echo $$HOME/.local/go/bin/go)
 
@@ -17,6 +17,18 @@ test-race:
 lint:
 	@echo "🐷 Running linter..."
 	@golangci-lint run
+
+lint-docs:
+	@echo "🐷 Linting markdown..."
+	@if command -v npx >/dev/null 2>&1; then \
+		npx --yes markdownlint-cli2 "**/*.md" "#node_modules"; \
+	else \
+		echo "npx not installed — skipping markdown lint"; \
+	fi
+
+tidy:
+	@echo "🐷 Checking go.mod is tidy..."
+	@$(GO) mod tidy -diff
 
 vet:
 	@echo "🐷 Running go vet..."

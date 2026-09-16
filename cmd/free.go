@@ -3,7 +3,6 @@ package cmd
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -13,7 +12,7 @@ import (
 
 // freeCmd represents the "free" command.
 // It checks if a specified port is free, and if it's busy, it automatically
-// scans for the next available port sequentially or within a specified range.
+// scans upwards for the next available port.
 var freeCmd = &cobra.Command{
 	Use:   "free [port]",
 	Short: "Find the next free port",
@@ -23,38 +22,38 @@ Useful when starting development servers and needing to quickly find an open por
 	Args: cobra.ExactArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
-		portStr := args[0]
-		portNum, err := strconv.ParseUint(portStr, 10, 32)
+
+		port, err := parsePort(args[0])
 		if err != nil {
-			output.PrintError("Invalid port number: %s", portStr)
+			output.PrintError("%v", err)
 			os.Exit(1)
 		}
 
+		// One scan covers the whole search: probing each candidate port
+		// individually would re-enumerate every socket on the machine.
 		scanner := ports.NewScanner()
-
-		isFree, err := scanner.IsFree(uint32(portNum))
+		busy, err := scanner.GetPortMap()
 		if err != nil {
 			output.PrintError("Failed to check port: %v", err)
 			os.Exit(1)
 		}
 
-		if isFree {
-			output.PrintSuccess("Port %d is free", portNum)
+		if len(busy[port]) == 0 {
+			output.PrintSuccess("Port %d is free", port)
 			return
 		}
 
-		output.PrintError("Port %d is busy", portNum)
+		output.PrintError("Port %d is busy", port)
 
-		for i := portNum + 1; i <= 65535; i++ {
-			free, err := scanner.IsFree(uint32(i))
-			if err != nil {
-				continue
-			}
-			if free {
-				output.PrintInfo("Next free port: %d", i)
+		for candidate := port + 1; candidate <= ports.MaxPort; candidate++ {
+			if len(busy[candidate]) == 0 {
+				output.PrintInfo("Next free port: %d", candidate)
 				return
 			}
 		}
+
+		output.PrintWarning("No free port above %d", port)
+		os.Exit(1)
 	},
 }
 

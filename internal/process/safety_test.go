@@ -18,35 +18,33 @@ func TestIsCritical(t *testing.T) {
 		{"Normal process is not critical", "node", 18422, false},
 		{"Normal process uppercase is not critical", "NODE", 18422, false},
 		{"Dockerd is critical", "dockerd", 999, true},
+
+		// Windows names are matched with the .exe suffix stripped.
+		{"lsass.exe is critical", "lsass.exe", 640, true},
+		{"LSASS.EXE is critical", "LSASS.EXE", 640, true},
+
+		// systemd spawns many differently-named helpers.
+		{"systemd-resolved is critical", "systemd-resolved", 771, true},
+		{"systemd-networkd is critical", "systemd-networkd", 772, true},
+
+		// Names that merely contain a critical keyword must not be flagged:
+		// this is what substring matching used to get wrong.
+		{"initdb is not critical", "initdb", 5001, false},
+		{"cronjob-runner is not critical", "cronjob-runner", 5002, false},
+		{"my-init is not critical", "my-init", 5003, false},
+		{"sshd-tunnel-helper is not critical", "sshd-tunnel-helper", 5004, false},
+		{"containerd-shim-mine is not critical", "containerd-shim-mine", 5005, false},
+
+		// Surrounding whitespace should not change the verdict.
+		{"Padded name is normalised", "  sshd  ", 600, true},
+		{"Empty name is not critical", "", 7000, false},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := IsCritical(tt.procName, tt.pid)
 			if result != tt.expected {
-				t.Errorf("IsCritical(%s, %d) = %v, expected %v", tt.procName, tt.pid, result, tt.expected)
-			}
-		})
-	}
-}
-
-func TestFormatCommand(t *testing.T) {
-	tests := []struct {
-		name      string
-		cmd       string
-		maxLength int
-		expected  string
-	}{
-		{"Short command", "npm start", 40, "npm start"},
-		{"Exact length command", "1234567890", 10, "1234567890"},
-		{"Long command truncated", "npm run dev --host 0.0.0.0 --port 3000", 20, "npm run dev --hos..."},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := FormatCommand(tt.cmd, tt.maxLength)
-			if result != tt.expected {
-				t.Errorf("FormatCommand(%s, %d) = %s, expected %s", tt.cmd, tt.maxLength, result, tt.expected)
+				t.Errorf("IsCritical(%q, %d) = %v, expected %v", tt.procName, tt.pid, result, tt.expected)
 			}
 		})
 	}

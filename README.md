@@ -14,7 +14,7 @@
 
 ## `~ ❯ man pork`
 
-```
+```text
 NAME
     pork — inspect, visualize and free local ports
 
@@ -37,6 +37,10 @@ COMMANDS
 OPTIONS
     --help          show help
     --version       show the current version
+
+KILL OPTIONS
+    -y, --yes       skip the confirmation prompt
+        --force     allow killing a critical process non-interactively
 ```
 
 ## `~ ❯ pork 3000`
@@ -49,7 +53,7 @@ pork 3000
 
 *Output:*
 
-```
+```text
 Error: Port 3000 is busy
 
   PID       18422
@@ -63,7 +67,7 @@ Error: Port 3000 is busy
 
 If the port is free:
 
-```
+```text
 🐷 Port 3000 is free
 ```
 
@@ -79,14 +83,14 @@ pork list
 
 *Output:*
 
-```
+```text
 ╭───────┬─────────┬───────────────────────────╮
 │ PORT  │ PID     │ PROGRAM                   │
 ├───────┼─────────┼───────────────────────────┤
 │ 3000  │ 18422   │ node                      │
 │ 5432  │ -       │ Unknown (requires sudo)   │
 │ 6379  │ -       │ Unknown (requires sudo)   │
-│ 8080  │ 11248   │ go run ./main.go          │
+│ 8080  │ 11248   │ go                        │
 ╰───────┴─────────┴───────────────────────────╯
 ```
 
@@ -100,10 +104,11 @@ Free a port without accidentally nuking something important:
 pork kill 3000
 ```
 
-Pork finds the process occupying the port, asks for confirmation, and refuses
-to touch critical system processes.
+Pork finds the process occupying the port and asks for confirmation. It requests
+a clean shutdown first and only forces the kill if the process is still alive a
+few seconds later, so it gets a chance to close its sockets.
 
-```
+```text
 🐷 Port 3000 is used by node PID 18422
 Command:
 npm run dev
@@ -114,7 +119,18 @@ Killed node process PID 18422
 ```
 
 Terminal applications are usually harmless. Something like `sshd` or a container
-runtime triggers a second, extra-visible warning before you're allowed to remove it.
+runtime is flagged as critical and triggers a second, extra-visible warning before
+you confirm.
+
+In scripts, pass `--yes` to skip the prompt:
+
+```bash
+pork kill 3000 --yes
+```
+
+Without `--yes`, a non-interactive run aborts rather than killing anything
+unattended. `--yes` on its own will not touch a process flagged as critical —
+that needs an explicit `--force` as well.
 
 ## `~ ❯ pork free 3000`
 
@@ -126,7 +142,7 @@ pork free 3000
 
 *Output (when the port is busy):*
 
-```
+```text
 Error: Port 3000 is busy
 🐷 Next free port: 3001
 ```
@@ -141,7 +157,7 @@ pork range 3000 3010
 
 *Output:*
 
-```
+```text
 🐷 Pork range scan
 
 3000  ● busy   node           PID 18422
@@ -209,13 +225,6 @@ make clean        # remove build artifacts
 
 Development setup is in [`CONTRIBUTING.md`](CONTRIBUTING.md). All checks above
 run automatically in CI on every pull request.
-
-## `~ ❯ roadmap`
-
-- [x] **v0.1.0** — Core CLI: inspect, list, kill, free, range.
-- [ ] **v0.2.0** — Advanced filtering (`--json`, `--process`), `--force`, `--yes`.
-- [ ] **v0.3.0** — Real-time `watch` mode and a richer `pork shell` TUI.
-- [ ] **v1.0.0** — Stable cross-platform releases, automated binaries, full docs.
 
 ## `~ ❯ man contributing`
 

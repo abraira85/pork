@@ -28,6 +28,17 @@ jobs:
         with:
           version: v2.13.2
 
+      - name: Check go.mod is tidy
+        run: go mod tidy -diff
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Lint docs
+        run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules"
+
       - name: Vet
         run: go vet ./...
 
