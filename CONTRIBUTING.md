@@ -38,7 +38,7 @@ Prefer `make test` and `make lint` from the repository root — they pin the exa
 
 Write clear, imperative commit messages that explain **why**:
 
-```
+```text
 fix: exclude system processes from kill safety checks
 ```
 

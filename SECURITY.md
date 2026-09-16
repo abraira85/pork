@@ -2,9 +2,9 @@
 
 ## Supported versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| latest  | :white_check_mark: |
+| Version  | Supported          |
+| -------- | ------------------ |
+| latest   | :white_check_mark: |
 | < latest | :x:                |
 
 Pork is under active development. Security fixes land on the latest release and are
@@ -20,7 +20,7 @@ malformed input.
 If you believe you have found a security issue:
 
 1. **Do not open a public issue.**
-2. Email the maintainer directly at **rober@outboss.io** with as much context as
+2. Email the maintainer directly at **<rober@outboss.io>** with as much context as
    you can safely share:
    - How the issue manifests (paste sanitized output if relevant),
    - What versions are affected,
