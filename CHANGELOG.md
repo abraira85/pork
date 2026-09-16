@@ -5,7 +5,13 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Releases v0.0.2 through v0.0.6 were cut automatically from Conventional Commits
+and are not documented individually here; see the
+[releases page](https://github.com/abraira85/pork/releases) for their contents.
+
 ## [Unreleased]
+
+## [0.1.0] - 2026-09-16
 
 ### Added
 
@@ -82,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are imported directly.
 - Every tracked text file now ends with a newline, as `.editorconfig` requires.
 
-## [0.1.0] - 2026-06-27
+## [0.0.1] - 2026-09-12
 
 ### Added
 
