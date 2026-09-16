@@ -14,6 +14,13 @@ import (
 	"github.com/abraira85/pork/internal/process"
 )
 
+var (
+	// killYes skips the interactive confirmation prompt.
+	killYes bool
+	// killForce additionally allows terminating processes flagged as critical.
+	killForce bool
+)
+
 // killCmd represents the "kill" command.
 // It finds the process(es) listening on the specified port and terminates them,
 // asking for confirmation first and flagging critical system processes.
@@ -26,7 +33,8 @@ Pork asks the process to shut down cleanly first and only forces the kill if it
 is still alive a few seconds later, so sockets and buffers get a chance to close.
 
 Processes that look like critical system components are flagged with an extra
-warning before you confirm.`,
+warning before you confirm. Use --yes to skip the prompt in scripts; killing a
+critical process non-interactively also requires --force.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
@@ -64,6 +72,11 @@ warning before you confirm.`,
 				fmt.Printf("\nPID      %d\nProcess  %s\nCommand  %s\n", info.PID, info.Process, info.Command)
 			}
 			fmt.Println()
+
+			if killYes && !killForce {
+				output.PrintError("Refusing to terminate a critical process with --yes alone. Re-run interactively or add --force.")
+				os.Exit(1)
+			}
 		}
 
 		if !confirmKill(len(critical) > 0) {
@@ -101,11 +114,16 @@ func criticalListeners(listeners []*ports.PortInfo) []*ports.PortInfo {
 	return critical
 }
 
-// confirmKill asks the user to confirm the termination.
+// confirmKill asks the user to confirm the termination, unless --yes was given.
 //
-// A closed or empty stdin counts as "no", so a non-interactive run aborts
-// instead of killing something unattended.
+// A closed or empty stdin counts as "no": without this, running pork in a
+// pipeline or CI job would silently abort anyway, so the explicit --yes flag is
+// the only way to kill unattended.
 func confirmKill(critical bool) bool {
+	if killYes {
+		return true
+	}
+
 	if critical {
 		fmt.Print("Kill anyway? [y/N]: ")
 	} else {
@@ -125,5 +143,7 @@ func confirmKill(critical bool) bool {
 
 // init registers the killCmd as a subcommand of rootCmd.
 func init() {
+	killCmd.Flags().BoolVarP(&killYes, "yes", "y", false, "skip the confirmation prompt")
+	killCmd.Flags().BoolVar(&killForce, "force", false, "allow terminating critical system processes non-interactively")
 	rootCmd.AddCommand(killCmd)
 }
