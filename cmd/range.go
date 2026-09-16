@@ -10,6 +10,7 @@ import (
 
 	"github.com/abraira85/pork/internal/output"
 	"github.com/abraira85/pork/internal/ports"
+	"github.com/abraira85/pork/internal/process"
 )
 
 // rangeCmd represents the "range" command.
@@ -24,37 +25,55 @@ for the busy ports.`,
 	Args: cobra.ExactArgs(2),
 	Run: func(_ *cobra.Command, args []string) {
 		output.PrintBanner()
-		startStr := args[0]
-		endStr := args[1]
 
-		startNum, err1 := strconv.ParseUint(startStr, 10, 32)
-		endNum, err2 := strconv.ParseUint(endStr, 10, 32)
+		start, errStart := parsePort(args[0])
+		end, errEnd := parsePort(args[1])
 
-		if err1 != nil || err2 != nil || startNum > endNum {
-			output.PrintError("Invalid range: %s to %s", startStr, endStr)
+		if errStart != nil || errEnd != nil || start > end {
+			output.PrintError("Invalid range: %s to %s (ports must be %d-%d, and start must not exceed end)",
+				args[0], args[1], ports.MinPort, ports.MaxPort)
 			os.Exit(1)
 		}
 
 		output.PrintInfo("Pork range scan\n")
 
+		// A single scan feeds the whole map; scanning per port made a wide
+		// range take one full system walk per port.
 		scanner := ports.NewScanner()
+		busy, err := scanner.GetPortMap()
+		if err != nil {
+			output.PrintError("Failed to scan ports: %v", err)
+			os.Exit(1)
+		}
 
 		var nextFree uint32
+		foundFree := false
 
-		for i := startNum; i <= endNum; i++ {
-			info, err := scanner.GetPortInfo(uint32(i))
-			if err != nil || info == nil {
-				fmt.Printf("%d  ○ free\n", i)
-				if nextFree == 0 {
-					nextFree = uint32(i)
+		for port := start; port <= end; port++ {
+			listeners := busy[port]
+			if len(listeners) == 0 {
+				fmt.Printf("%d  ○ free\n", port)
+				if !foundFree {
+					nextFree = port
+					foundFree = true
 				}
-			} else {
-				fmt.Printf("%d  ● busy   %-15s PID %d\n", i, info.Process, info.PID)
+				continue
+			}
+
+			for _, info := range listeners {
+				// Mirror the wording used by `pork list`: without elevated
+				// privileges the socket is visible but its owner is not.
+				program, pid := "Unknown (sudo)", "-"
+				if info.PID > 0 {
+					program = process.Identify(info.Process, info.Command)
+					pid = strconv.Itoa(int(info.PID))
+				}
+				fmt.Printf("%d  ● busy   %-15s PID %s\n", port, program, pid)
 			}
 		}
 
 		fmt.Printf("\n● busy   ○ free\n\n")
-		if nextFree != 0 {
+		if foundFree {
 			output.PrintSuccess("Next free port: %d", nextFree)
 		} else {
 			output.PrintWarning("No free ports in this range")

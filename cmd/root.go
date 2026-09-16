@@ -5,7 +5,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/spf13/cobra"
 
@@ -21,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Long: `Pork is a tiny terminal tool to inspect, visualize and free local ports.
 It provides a beautiful and simple interface over standard tools like lsof or netstat.`,
 	Version: version,
-	Args:    cobra.ArbitraryArgs,
+	Args:    cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		output.PrintBanner()
 		if len(args) == 0 {
@@ -30,21 +29,25 @@ It provides a beautiful and simple interface over standard tools like lsof or ne
 			return
 		}
 
-		portStr := args[0]
-		portNum, err := strconv.ParseUint(portStr, 10, 32)
+		if !isNumeric(args[0]) {
+			output.PrintError("Unknown command %q. Run 'pork --help' to see the available commands.", args[0])
+			os.Exit(1)
+		}
+
+		port, err := parsePort(args[0])
 		if err != nil {
-			output.PrintError("Invalid port number: %s", portStr)
+			output.PrintError("%v", err)
 			os.Exit(1)
 		}
 
 		scanner := ports.NewScanner()
-		info, err := scanner.GetPortInfo(uint32(portNum))
+		listeners, err := scanner.GetPortProcesses(port)
 		if err != nil {
 			output.PrintError("Failed to inspect port: %v", err)
 			os.Exit(1)
 		}
 
-		output.PrintPortInspection(uint32(portNum), info)
+		output.PrintPortInspection(port, listeners)
 	},
 }
 

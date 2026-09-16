@@ -9,8 +9,15 @@ import (
 	"github.com/shirou/gopsutil/v3/process"
 )
 
-// Info encapsulates the metadata and resource usage of an operating system process.
-// It is fetched on-demand to avoid heavy system calls when not needed.
+// maxDisplayLen is the widest a process identifier may be before it is elided.
+const maxDisplayLen = 30
+
+// Info encapsulates the metadata of an operating system process.
+//
+// It deliberately carries only the fields Pork actually renders. Resource
+// counters such as CPU% or RSS are far more expensive to collect than the
+// basics, and every extra field is paid once per listening socket on every
+// scan, including the TUI's periodic refresh.
 type Info struct {
 	// PID is the unique Process ID.
 	PID int32
@@ -20,17 +27,11 @@ type Info struct {
 	Command string
 	// User is the operating system user who owns the process.
 	User string
-	// Path is the absolute file path to the executable binary.
-	Path string
-	// CPU represents the percentage of CPU currently utilized by the process.
-	CPU float64
-	// MemoryMB represents the Resident Set Size (RSS) memory used in Megabytes.
-	MemoryMB float64
 }
 
-// GetInfo retrieves comprehensive metadata for a given Process ID (PID).
-// It queries the operating system (using gopsutil) to gather details like
-// the process name, command line arguments, owner, and resource usage.
+// GetInfo retrieves metadata for a given Process ID (PID).
+// It queries the operating system (using gopsutil) to gather the process name,
+// command line arguments, and owner.
 // Returns an error if the process does not exist or if permissions are insufficient.
 func GetInfo(pid int32) (*Info, error) {
 	p, err := process.NewProcess(pid)
@@ -38,59 +39,50 @@ func GetInfo(pid int32) (*Info, error) {
 		return nil, err
 	}
 
+	// Each accessor may fail independently (most often because the process is
+	// owned by another user); an empty field is better than discarding the rest.
 	name, _ := p.Name()
 	cmd, _ := p.Cmdline()
 	user, _ := p.Username()
-	path, _ := p.Exe()
-
-	// CPU usage calculation can block or be inaccurate without a time window.
-	// For this tool, a quick percentage query is sufficient.
-	cpu, _ := p.CPUPercent()
-
-	memInfo, err := p.MemoryInfo()
-	var memMB float64
-	if err == nil && memInfo != nil {
-		memMB = float64(memInfo.RSS) / 1024 / 1024
-	}
 
 	return &Info{
-		PID:      pid,
-		Name:     name,
-		Command:  cmd,
-		User:     user,
-		Path:     path,
-		CPU:      cpu,
-		MemoryMB: memMB,
+		PID:     pid,
+		Name:    name,
+		Command: cmd,
+		User:    user,
 	}, nil
 }
 
 // Identify returns a simplified, human-readable identifier for the process.
+// It prefers the executable invoked on the command line and falls back to the
+// process name reported by the OS.
 func Identify(name, cmd string) string {
 	if cmd != "" {
-		parts := strings.Split(cmd, " ")
+		parts := strings.Fields(cmd)
 		if len(parts) > 0 {
 			base := filepath.Base(parts[0])
-			if base != "" && base != "." {
-				// Truncate if it's absurdly long
-				if len(base) > 30 {
-					return base[:27] + "..."
-				}
-				return base
+			if base != "" && base != "." && base != string(filepath.Separator) {
+				return truncate(base, maxDisplayLen)
 			}
 		}
 	}
-	if len(name) > 30 {
-		return name[:27] + "..."
-	}
-	return name
+	return truncate(name, maxDisplayLen)
 }
 
-// FormatCommand truncates a long command line string to a specified maximum length,
-// appending an ellipsis ("...") if truncation occurred. This is useful for UI display
-// where long commands might break table formatting.
-func FormatCommand(cmd string, maxLength int) string {
-	if len(cmd) > maxLength && maxLength > 3 {
-		return cmd[:maxLength-3] + "..."
+// truncate shortens s to at most maxLen characters, appending an ellipsis when
+// it has to cut. It counts runes rather than bytes so that a multi-byte path is
+// never sliced mid-character.
+func truncate(s string, maxLen int) string {
+	if maxLen <= 0 {
+		return ""
 	}
-	return cmd
+
+	runes := []rune(s)
+	if len(runes) <= maxLen {
+		return s
+	}
+	if maxLen <= 3 {
+		return string(runes[:maxLen])
+	}
+	return string(runes[:maxLen-3]) + "..."
 }

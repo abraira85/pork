@@ -10,6 +10,14 @@ import (
 	porkprocess "github.com/abraira85/pork/internal/process"
 )
 
+// MinPort and MaxPort bound the range of addressable TCP ports. Port 0 is
+// excluded on purpose: it means "let the kernel pick one" and can never be
+// inspected, freed or killed.
+const (
+	MinPort uint32 = 1
+	MaxPort uint32 = 65535
+)
+
 // Scanner handles scanning for active ports and mapping them to processes.
 type Scanner struct{}
 
@@ -18,9 +26,18 @@ func NewScanner() *Scanner {
 	return &Scanner{}
 }
 
+// listenerKey identifies a distinct listener. Deduplicating on the port alone
+// would hide a second process bound to the same port on a different interface;
+// keying on the owning PID as well collapses the common case (one process
+// listening over both IPv4 and IPv6) without losing that information.
+type listenerKey struct {
+	port uint32
+	pid  int32
+}
+
 // GetActivePorts retrieves a list of all currently listening TCP ports.
 // It maps the network connections to their respective system processes.
-// Returns a slice of PortInfo sorted by port number.
+// Returns a slice of PortInfo sorted by port number, then by PID.
 func (s *Scanner) GetActivePorts() ([]*PortInfo, error) {
 	// "tcp" means ipv4 and ipv6 TCP connections
 	conns, err := gopsnet.Connections("tcp")
@@ -29,7 +46,12 @@ func (s *Scanner) GetActivePorts() ([]*PortInfo, error) {
 	}
 
 	var results []*PortInfo
-	seen := make(map[uint32]bool)
+	seen := make(map[listenerKey]bool)
+
+	// Process metadata is looked up once per PID rather than once per socket:
+	// a process listening on many ports is common and the lookup is the
+	// expensive part of a scan.
+	procs := make(map[int32]*porkprocess.Info)
 
 	for _, conn := range conns {
 		// We are only interested in ports that are currently listening
@@ -37,18 +59,16 @@ func (s *Scanner) GetActivePorts() ([]*PortInfo, error) {
 			continue
 		}
 
-		port := conn.Laddr.Port
-
-		// Avoid duplicate entries if multiple interfaces listen on the same port
-		if seen[port] {
+		key := listenerKey{port: conn.Laddr.Port, pid: conn.Pid}
+		if seen[key] {
 			continue
 		}
-		seen[port] = true
+		seen[key] = true
 
 		info := &PortInfo{
-			Port:     port,
+			Port:     conn.Laddr.Port,
 			Protocol: "TCP",
-			Address:  fmt.Sprintf("%s:%d", conn.Laddr.IP, port),
+			Address:  fmt.Sprintf("%s:%d", conn.Laddr.IP, conn.Laddr.Port),
 			Status:   conn.Status,
 			PID:      conn.Pid,
 		}
@@ -56,49 +76,70 @@ func (s *Scanner) GetActivePorts() ([]*PortInfo, error) {
 		// If we successfully found a PID associated with this port, fetch its details.
 		// Note: Requires elevated privileges on some OS to see PIDs of other users.
 		if conn.Pid > 0 {
-			if procInfo, err := porkprocess.GetInfo(conn.Pid); err == nil {
+			procInfo, cached := procs[conn.Pid]
+			if !cached {
+				procInfo, _ = porkprocess.GetInfo(conn.Pid)
+				procs[conn.Pid] = procInfo
+			}
+			if procInfo != nil {
 				info.Process = procInfo.Name
 				info.Command = procInfo.Command
 				info.User = procInfo.User
-				info.Path = procInfo.Path
-				info.CPU = procInfo.CPU
-				info.MemoryMB = procInfo.MemoryMB
 			}
 		}
 
 		results = append(results, info)
 	}
 
-	// Sort the results by port number for better readability
+	// Sort for stable, readable output.
 	sort.Slice(results, func(i, j int) bool {
-		return results[i].Port < results[j].Port
+		if results[i].Port != results[j].Port {
+			return results[i].Port < results[j].Port
+		}
+		return results[i].PID < results[j].PID
 	})
 
 	return results, nil
 }
 
-// GetPortInfo retrieves information for a specific port.
-// Returns nil if the port is not currently listening.
-func (s *Scanner) GetPortInfo(port uint32) (*PortInfo, error) {
-	ports, err := s.GetActivePorts()
+// GetPortMap returns every listening port indexed by port number, using a
+// single system scan.
+//
+// Commands that need to test many ports (free, range) must use this instead of
+// calling GetPortInfo in a loop: each GetPortInfo call is a full enumeration of
+// the machine's sockets and their owning processes, which turns a range scan
+// into thousands of redundant system walks.
+//
+// When several processes share a port, the entry with the lowest PID wins;
+// GetPortProcesses exposes the full set.
+func (s *Scanner) GetPortMap() (map[uint32][]*PortInfo, error) {
+	activePorts, err := s.GetActivePorts()
 	if err != nil {
 		return nil, err
 	}
 
-	for _, p := range ports {
+	byPort := make(map[uint32][]*PortInfo, len(activePorts))
+	for _, p := range activePorts {
+		byPort[p.Port] = append(byPort[p.Port], p)
+	}
+
+	return byPort, nil
+}
+
+// GetPortProcesses retrieves every listener bound to a specific port.
+// Returns an empty slice if the port is not currently in use.
+func (s *Scanner) GetPortProcesses(port uint32) ([]*PortInfo, error) {
+	activePorts, err := s.GetActivePorts()
+	if err != nil {
+		return nil, err
+	}
+
+	var matches []*PortInfo
+	for _, p := range activePorts {
 		if p.Port == port {
-			return p, nil
+			matches = append(matches, p)
 		}
 	}
 
-	return nil, nil // Port is free
-}
-
-// IsFree checks if a specific port is currently free (not listening).
-func (s *Scanner) IsFree(port uint32) (bool, error) {
-	info, err := s.GetPortInfo(port)
-	if err != nil {
-		return false, err
-	}
-	return info == nil, nil
+	return matches, nil
 }
